@@ -52,49 +52,76 @@ if uploaded_file:
         st.dataframe(df.style.format("{:.0f}"))
 
         # Grafico ad aree stacked
-        st.subheader("📈 Andamento Fabbisogno Year by Year")
-
-        fig = go.Figure()
+        fig_solar = go.Figure()
         
         # PPA
-        fig.add_trace(go.Scatter(
+        fig_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["PPA_effettivo"], 
-            name="PPA ERG/Cuscinetto", stackgroup='one', mode='none',
-            fillcolor='lightblue'
+            name="PPA ERG/Cuscinetto", stackgroup='one', mode='none', fillcolor='lightblue'
         ))
         # FRW
-        fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["FRW"],
-            name="FRW", stackgroup='one', mode='none',
-            fillcolor='orange'
+        fig_solar.add_trace(go.Scatter(
+            x=df["Anno"], y=df["FRW"], 
+            name="FRW", stackgroup='one', mode='none', fillcolor='orange'
         ))
         # Solar
-        fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Solar"],
-            name="Solar", stackgroup='one', mode='none',
-            fillcolor='yellow'
+        fig_solar.add_trace(go.Scatter(
+            x=df["Anno"], y=df["Solar"], 
+            name="Solar", stackgroup='one', mode='none', fillcolor='yellow'
         ))
-        # Open Position (residuo)
-        fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Open Position"],
-            name="Open Position", stackgroup='one', mode='none',
-            fillcolor='red'
+        # Open Position w Solar
+        fig_solar.add_trace(go.Scatter(
+            x=df["Anno"], y=df["Open Position w Solar (Adjusted)"], 
+            name="Open Position", stackgroup='one', mode='none', fillcolor='red'
         ))
-        
-        # Linea fabbisogno adjusted
-        fig.add_trace(go.Scatter(
+        # Linea fabbisogno Adjusted
+        fig_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["Fabbisogno Adjusted"], 
             name="Fabbisogno Adjusted", mode='lines+markers',
             line=dict(color='black', dash='dash')
         ))
         
-        fig.update_layout(
-            title="Coperture vs Fabbisogno",
+        fig_solar.update_layout(
+            title="Scenario: con Solar",
             yaxis_title="MW", xaxis_title="Anno",
             legend_title="Legenda",
             hovermode="x unified"
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig_solar, use_container_width=True)
+        
+        # -------------------------
+        st.subheader("📊 Grafico ad aree: Copertura senza Solar")
+        fig_no_solar = go.Figure()
+        
+        # PPA
+        fig_no_solar.add_trace(go.Scatter(
+            x=df["Anno"], y=df["PPA_effettivo"], 
+            name="PPA ERG/Cuscinetto", stackgroup='one', mode='none', fillcolor='lightblue'
+        ))
+        # FRW
+        fig_no_solar.add_trace(go.Scatter(
+            x=df["Anno"], y=df["FRW"], 
+            name="FRW", stackgroup='one', mode='none', fillcolor='orange'
+        ))
+        # Open Position w/o Solar
+        fig_no_solar.add_trace(go.Scatter(
+            x=df["Anno"], y=df["Open Position w/o Solar (Adjusted)"], 
+            name="Open Position", stackgroup='one', mode='none', fillcolor='red'
+        ))
+        # Linea fabbisogno Adjusted
+        fig_no_solar.add_trace(go.Scatter(
+            x=df["Anno"], y=df["Fabbisogno Adjusted"], 
+            name="Fabbisogno Adjusted", mode='lines+markers',
+            line=dict(color='black', dash='dash')
+        ))
+        
+        fig_no_solar.update_layout(
+            title="Scenario: senza Solar",
+            yaxis_title="MW", xaxis_title="Anno",
+            legend_title="Legenda",
+            hovermode="x unified"
+        )
+        st.plotly_chart(fig_no_solar, use_container_width=True)
         
         # Download del risultato
         output = df.to_excel(index=False, engine="openpyxl")
