@@ -51,10 +51,12 @@ if uploaded_file:
         st.subheader("📈 Tabella con Open Position calcolati")
         st.dataframe(df.style.format("{:.0f}"))
 
-        # SCENARIO CON SOLAR
-        st.subheader("📊 Scenario: con Solar")
+        import plotly.graph_objects as go
+        import streamlit as st
         
-        # Copertura totale e Open Position residua
+        # -----------------------------------------------
+        # SCENARIO: con Solar
+        # -----------------------------------------------
         df["Copertura_totale_con_solar"] = df["PPA_effettivo"] + df["FRW"] + df["Solar"]
         df["OpenPosition_residua_con_solar"] = (df["Fabbisogno Adjusted"] - df["Copertura_totale_con_solar"]).clip(lower=0)
         
@@ -62,15 +64,15 @@ if uploaded_file:
         
         # Aree stacked: PPA, FRW, Solar
         fig_solar.add_trace(go.Scatter(
-            x=df["Anno"], y=df["PPA_effettivo"], 
+            x=df["Anno"], y=df["PPA_effettivo"],
             name="PPA ERG/Cuscinetto", stackgroup='one', mode='none', fillcolor='lightblue'
         ))
         fig_solar.add_trace(go.Scatter(
-            x=df["Anno"], y=df["FRW"], 
+            x=df["Anno"], y=df["FRW"],
             name="FRW", stackgroup='one', mode='none', fillcolor='orange'
         ))
         fig_solar.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Solar"], 
+            x=df["Anno"], y=df["Solar"],
             name="Solar", stackgroup='one', mode='none', fillcolor='yellow'
         ))
         
@@ -85,38 +87,34 @@ if uploaded_file:
             fillcolor='rgba(255,0,0,0.3)'
         ))
         
-        # Linea di riferimento Fabbisogno Adjusted
+        # Linee di riferimento fabbisogno
         fig_solar.add_trace(go.Scatter(
-            x=df["Anno"],
-            y=df["Fabbisogno Adjusted"],
+            x=df["Anno"], y=df["Fabbisogno Adjusted"],
             name="Fabbisogno Adjusted",
             mode='lines',
             line=dict(color='black', dash='dash')
         ))
-        
-        # Linea di riferimento Fabbisogno
         fig_solar.add_trace(go.Scatter(
-            x=df["Anno"],
-            y=df["Fabbisogno"],
-            name="Fabbisogno", 
+            x=df["Anno"], y=df["Fabbisogno"],
+            name="Fabbisogno",
             mode='lines',
             line=dict(color='gray', dash='dot')
         ))
         
         fig_solar.update_layout(
-            title="Copertura con Solar",
+            title="Scenario: con Solar",
             yaxis_title="MW",
             xaxis_title="Anno",
             legend_title="Legenda",
             hovermode="x unified"
         )
+        
         st.plotly_chart(fig_solar, use_container_width=True)
         
         
-        # -------------------------
-        # SCENARIO SENZA SOLAR
-        st.subheader("📊 Scenario: senza Solar")
-        
+        # -----------------------------------------------
+        # SCENARIO: senza Solar
+        # -----------------------------------------------
         df["Copertura_totale_senza_solar"] = df["PPA_effettivo"] + df["FRW"]
         df["OpenPosition_residua_senza_solar"] = (df["Fabbisogno Adjusted"] - df["Copertura_totale_senza_solar"]).clip(lower=0)
         
@@ -124,15 +122,15 @@ if uploaded_file:
         
         # Aree stacked: PPA, FRW
         fig_no_solar.add_trace(go.Scatter(
-            x=df["Anno"], y=df["PPA_effettivo"], 
+            x=df["Anno"], y=df["PPA_effettivo"],
             name="PPA ERG/Cuscinetto", stackgroup='one', mode='none', fillcolor='lightblue'
         ))
         fig_no_solar.add_trace(go.Scatter(
-            x=df["Anno"], y=df["FRW"], 
+            x=df["Anno"], y=df["FRW"],
             name="FRW", stackgroup='one', mode='none', fillcolor='orange'
         ))
         
-        # Open Position residua come area tratteggiata rossa sopra le coperture
+        # Open Position residua come area tratteggiata rossa
         fig_no_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["Copertura_totale_senza_solar"] + df["OpenPosition_residua_senza_solar"],
@@ -143,32 +141,30 @@ if uploaded_file:
             fillcolor='rgba(255,0,0,0.3)'
         ))
         
-        # Linea di riferimento Fabbisogno Adjusted
+        # Linee di riferimento fabbisogno
         fig_no_solar.add_trace(go.Scatter(
-            x=df["Anno"],
-            y=df["Fabbisogno Adjusted"],
+            x=df["Anno"], y=df["Fabbisogno Adjusted"],
             name="Fabbisogno Adjusted",
             mode='lines',
             line=dict(color='black', dash='dash')
         ))
-        
-        # Linea di riferimento Fabbisogno
         fig_no_solar.add_trace(go.Scatter(
-            x=df["Anno"],
-            y=df["Fabbisogno"],
-            name="Fabbisogno", 
+            x=df["Anno"], y=df["Fabbisogno"],
+            name="Fabbisogno",
             mode='lines',
             line=dict(color='gray', dash='dot')
         ))
         
         fig_no_solar.update_layout(
-            title="Copertura senza Solar",
+            title="Scenario: senza Solar",
             yaxis_title="MW",
             xaxis_title="Anno",
             legend_title="Legenda",
             hovermode="x unified"
         )
+        
         st.plotly_chart(fig_no_solar, use_container_width=True)
+        
         
         # Download del risultato
         from io import BytesIO
