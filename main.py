@@ -51,54 +51,64 @@ if uploaded_file:
         st.subheader("📈 Tabella con Open Position calcolati")
         st.dataframe(df.style.format("{:.0f}"))
 
-        # -----------------------------
-        # Calcoli per scenario con Solar
-        # -----------------------------
+        # Calcoli
         df["Copertura_totale_con_solar"] = df["PPA_effettivo"] + df["FRW"] + df["Solar"]
-        df["OpenPosition_con_solar"] = (df["Fabbisogno Adjusted"] - df["Copertura_totale_con_solar"]).clip(lower=0)
+        df["OpenPosition_vuoto_con_solar"] = (df["Fabbisogno Adjusted"] - df["Copertura_totale_con_solar"]).clip(lower=0)
         
         fig_solar = go.Figure()
         
-        # Prima traccia: Open Position (in basso o sopra? dipende dal colore, qui la mettiamo in basso come stack residuo)
-        fig_solar.add_trace(go.Bar(
+        # Open Position vuota come area bianca dal basso
+        fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["OpenPosition_con_solar"],
-            name="Open Position",
-            marker=dict(color="red", pattern=dict(shape="\\"))
+            y=df["OpenPosition_vuoto_con_solar"],
+            name="Open Position (vuoto)",
+            mode='lines',
+            line=dict(color='white'),
+            fill='tozeroy',
+            fillcolor='rgba(255,255,255,1)',
+            hovertemplate='Open Position: %{y} MW<extra></extra>'
         ))
         
-        # Coperture stacked: PPA, FRW, Solar
-        fig_solar.add_trace(go.Bar(
+        # Coperture come aree continue stacked
+        fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["PPA_effettivo"],
+            y=df["OpenPosition_vuoto_con_solar"] + df["PPA_effettivo"],
             name="PPA ERG/Cuscinetto",
-            marker=dict(color="lightblue")
+            mode='lines',
+            line=dict(color='lightblue'),
+            fill='tonexty',
+            fillcolor='rgba(173,216,230,0.8)'  # lightblue semi-trasparente
         ))
-        fig_solar.add_trace(go.Bar(
+        fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["FRW"],
+            y=df["OpenPosition_vuoto_con_solar"] + df["PPA_effettivo"] + df["FRW"],
             name="FRW",
-            marker=dict(color="orange")
+            mode='lines',
+            line=dict(color='orange'),
+            fill='tonexty',
+            fillcolor='rgba(255,165,0,0.8)'  # arancione semi-trasparente
         ))
-        fig_solar.add_trace(go.Bar(
+        fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["Solar"],
+            y=df["Copertura_totale_con_solar"],
             name="Solar",
-            marker=dict(color="yellow")
+            mode='lines',
+            line=dict(color='yellow'),
+            fill='tonexty',
+            fillcolor='rgba(255,255,0,0.8)'  # giallo semi-trasparente
         ))
         
-        # Area totale Fabbisogno (sfondo)
+        # Linea fabbisogno Adjusted
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["Fabbisogno Adjusted"],
             name="Fabbisogno Adjusted",
-            mode="lines",
-            line=dict(color="black", dash="dash")
+            mode='lines',
+            line=dict(color='black', dash='dash')
         ))
         
         fig_solar.update_layout(
-            barmode='stack',
-            title="Scenario con Solar",
+            title="Scenario con Solar - Grafico ad Aree",
             yaxis_title="MW",
             xaxis_title="Anno",
             legend_title="Legenda",
@@ -106,57 +116,6 @@ if uploaded_file:
         )
         
         st.plotly_chart(fig_solar, use_container_width=True)
-        
-        
-        # -----------------------------
-        # Scenario senza Solar
-        # -----------------------------
-        df["Copertura_totale_senza_solar"] = df["PPA_effettivo"] + df["FRW"]
-        df["OpenPosition_senza_solar"] = (df["Fabbisogno Adjusted"] - df["Copertura_totale_senza_solar"]).clip(lower=0)
-        
-        fig_no_solar = go.Figure()
-        
-        # Open Position
-        fig_no_solar.add_trace(go.Bar(
-            x=df["Anno"],
-            y=df["OpenPosition_senza_solar"],
-            name="Open Position",
-            marker=dict(color="red", pattern=dict(shape="\\"))
-        ))
-        
-        # Coperture stacked
-        fig_no_solar.add_trace(go.Bar(
-            x=df["Anno"],
-            y=df["PPA_effettivo"],
-            name="PPA ERG/Cuscinetto",
-            marker=dict(color="lightblue")
-        ))
-        fig_no_solar.add_trace(go.Bar(
-            x=df["Anno"],
-            y=df["FRW"],
-            name="FRW",
-            marker=dict(color="orange")
-        ))
-        
-        # Linea Fabbisogno Adjusted
-        fig_no_solar.add_trace(go.Scatter(
-            x=df["Anno"],
-            y=df["Fabbisogno Adjusted"],
-            name="Fabbisogno Adjusted",
-            mode="lines",
-            line=dict(color="black", dash="dash")
-        ))
-        
-        fig_no_solar.update_layout(
-            barmode='stack',
-            title="Scenario senza Solar",
-            yaxis_title="MW",
-            xaxis_title="Anno",
-            legend_title="Legenda",
-            hovermode="x unified"
-        )
-        
-        st.plotly_chart(fig_no_solar, use_container_width=True)
 
 
         
