@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from io import BytesIO
+
 
 st.set_page_config(page_title="Calcolo Open Position", layout="wide")
 
@@ -50,14 +51,13 @@ if uploaded_file:
         st.subheader("📈 Tabella con Open Position calcolati")
         st.dataframe(df.style.format("{:.0f}"))
 
-        # -----------------------------
-        # Scenario con Solar
-        # -----------------------------
+        # Calcolo copertura totale
         df["Copertura_totale_con_solar"] = df["PPA_effettivo"] + df["FRW"] + df["Solar"]
-                
+        df["OpenPosition_con_solar"] = (df["Fabbisogno Adjusted"] - df["Copertura_totale_con_solar"]).clip(lower=0)
+        
         fig_solar = go.Figure()
-
-        # Area Fabbisogno Adjusted (sfondo blu)
+        
+        # 1️⃣ Fabbisogno Adjusted → sfondo blu
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["Fabbisogno Adjusted"],
@@ -65,10 +65,12 @@ if uploaded_file:
             mode='lines',
             line=dict(color='blue'),
             fill='tozeroy',
-            fillcolor='rgba(0,0,255,0.3)'
+            fillcolor='rgba(0,0,255,0.2)',
+            hovertemplate='Fabbisogno Adjusted: %{y} MW<extra></extra>'
         ))
-
-        # Coperture stacked
+        
+        # 2️⃣ Coperture stacked (PPA + FRW + Solar)
+        # PPA
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["PPA_effettivo"],
@@ -76,17 +78,21 @@ if uploaded_file:
             mode='lines',
             line=dict(color='green'),
             fill='tonexty',
-            fillcolor='rgba(0,128,0,0.7)'
+            fillcolor='rgba(0,128,0,0.7)',
+            hovertemplate='PPA: %{y} MW<extra></extra>'
         ))
+        # PPA + FRW
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["PPA_effettivo"] + df["FRW"],
-            name="Forward (FRW)",
+            name="FRW",
             mode='lines',
             line=dict(color='deepskyblue'),
             fill='tonexty',
-            fillcolor='rgba(135,206,250,0.7)'
+            fillcolor='rgba(135,206,250,0.7)',
+            hovertemplate='FRW: %{y} MW<extra></extra>'
         ))
+        # PPA + FRW + Solar
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["Copertura_totale_con_solar"],
@@ -94,20 +100,22 @@ if uploaded_file:
             mode='lines',
             line=dict(color='gold'),
             fill='tonexty',
-            fillcolor='rgba(255,215,0,0.7)'
+            fillcolor='rgba(255,215,0,0.7)',
+            hovertemplate='Solar: %{y} MW<extra></extra>'
         ))
-
-        # Open Position → delta bianco sopra copertura
+        
+        # 3️⃣ Open Position → area bianca sopra copertura fino al fabbisogno
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["Open Position w Solar (Adjusted)"],
+            y=df["Fabbisogno Adjusted"],  # in alto layer = fabbisogno totale
             name="Open Position",
             mode='lines',
             line=dict(color='white'),
             fill='tonexty',
-            fillcolor='rgba(255,255,255,1)'
+            fillcolor='rgba(255,255,255,1)',
+            hovertemplate='Open Position: %{y - df.Copertura_totale_con_solar} MW<extra></extra>'
         ))
-
+        
         fig_solar.update_layout(
             title="Scenario con Solar - Grafico ad Aree",
             yaxis_title="MW",
@@ -115,17 +123,17 @@ if uploaded_file:
             legend_title="Legenda",
             hovermode="x unified"
         )
-
+        
         st.plotly_chart(fig_solar, use_container_width=True)
 
-        
 
-        # -----------------------------
         # Download del risultato
-        # -----------------------------
+        from io import BytesIO
+
+        # Creiamo un buffer in memoria
         output_buffer = BytesIO()
         df.to_excel(output_buffer, index=False, engine="openpyxl")
-        output_buffer.seek(0)
+        output_buffer.seek(0)  # Torniamo all'inizio del buffer
 
         st.download_button(
             label="📥 Scarica Excel con risultati",
