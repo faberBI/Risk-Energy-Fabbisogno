@@ -116,7 +116,7 @@ if uploaded_file:
             line=dict(color='white'),
             fill='tonexty',
             fillcolor='rgba(255,255,255,1)',
-            customdata=df["OpenPosition_con_solar"],  # qui metti il delta reale
+            customdata=df["Open Position w Solar (Adjusted)"],  # qui metti il delta reale
             hovertemplate='Open Position: %{customdata} MW<extra></extra>'
         ))
 
