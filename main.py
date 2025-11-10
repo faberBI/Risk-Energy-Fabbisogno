@@ -55,8 +55,8 @@ if uploaded_file:
         df["Anno"] = pd.to_datetime(df["Anno"], format="%Y")
 
         # Calcolo copertura totale
-        df["Copertura_totale_con_solar"] = df["PPA_effettivo"] + df["FRW"] + df["Solar"]
-        df["OpenPosition_con_solar"] = (df["Fabbisogno Adjusted"] - df["Copertura_totale_con_solar"]).clip(lower=0)
+        #df["Copertura_totale_con_solar"] = df["PPA_effettivo"] + df["FRW"] + df["Solar"]
+        #df["OpenPosition_con_solar"] = (df["Fabbisogno Adjusted"] - df["Copertura_totale_con_solar"]).clip(lower=0)
 
         fig_solar = go.Figure()
 
@@ -98,7 +98,7 @@ if uploaded_file:
         # Solar (#dde9ff)
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["Copertura_totale_con_solar"],
+            y=df["Solar"],
             name="Solar",
             mode='lines',
             line=dict(color='#dde9ff'),
@@ -125,11 +125,8 @@ if uploaded_file:
             yaxis_title="MW",
             xaxis_title="Anno",
             legend_title="Legenda",
-            hovermode="x unified",
-            xaxis=dict(
-                tickformat="%Y",
-                dtick="M12"
-                            ))
+            hovermode="x unified"
+        )
 
         st.plotly_chart(fig_solar, use_container_width=True)
 
