@@ -125,8 +125,12 @@ if uploaded_file:
             yaxis_title="MW",
             xaxis_title="Anno",
             legend_title="Legenda",
-            hovermode="x unified"
-        )
+            hovermode="x unified",
+            xaxis=dict(
+                tickformat="%Y",  # Mostra solo l'anno
+                dtick="M12"       # tick ogni 12 mesi
+            )
+                )
 
         st.plotly_chart(fig_solar, use_container_width=True)
 
