@@ -51,16 +51,19 @@ if uploaded_file:
         st.subheader("📈 Tabella con Open Position calcolati")
         st.dataframe(df.style.format("{:.0f}"))
 
-        # Assicurati che "Anno" sia in formato datetime
+
+
+        # Assicurati che "Anno" sia in datetime
         df["Anno"] = pd.to_datetime(df["Anno"], format="%Y")
-
-        # Calcolo copertura totale
-        #df["Copertura_totale_con_solar"] = df["PPA_effettivo"] + df["FRW"] + df["Solar"]
-        #df["OpenPosition_con_solar"] = (df["Fabbisogno Adjusted"] - df["Copertura_totale_con_solar"]).clip(lower=0)
-
+        
+        # Calcolo copertura cumulativa per stacking
+        df["PPA_cum"] = df["PPA_effettivo"]
+        df["FRW_cum"] = df["PPA_effettivo"] + df["FRW"]
+        df["Solar_cum"] = df["PPA_effettivo"] + df["FRW"] + df["Solar"]
+        
         fig_solar = go.Figure()
-
-        # 1️⃣ Fabbisogno Adjusted → sfondo blu scuro (#00196c)
+        
+        # 1️⃣ Fabbisogno Adjusted → sfondo blu scuro
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["Fabbisogno Adjusted"],
@@ -71,12 +74,12 @@ if uploaded_file:
             fillcolor='rgba(0,25,108,0.3)',
             hovertemplate='Fabbisogno Adjusted: %{y} MW<extra></extra>'
         ))
-
+        
         # 2️⃣ Coperture stacked
-        # PPA (#94dcf8)
+        # PPA
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["PPA_effettivo"],
+            y=df["PPA_cum"],
             name="PPA ERG/Cuscinetto",
             mode='lines',
             line=dict(color='#94dcf8'),
@@ -84,10 +87,10 @@ if uploaded_file:
             fillcolor='rgba(148,220,248,0.7)',
             hovertemplate='PPA: %{y} MW<extra></extra>'
         ))
-        # FRW (#003caa)
+        # FRW
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["PPA_effettivo"] + df["FRW"],
+            y=df["FRW_cum"],
             name="FRW",
             mode='lines',
             line=dict(color='#003caa'),
@@ -95,10 +98,10 @@ if uploaded_file:
             fillcolor='rgba(0,60,170,0.7)',
             hovertemplate='FRW: %{y} MW<extra></extra>'
         ))
-        # Solar (#dde9ff)
+        # Solar
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["Solar"],
+            y=df["Solar_cum"],
             name="Solar",
             mode='lines',
             line=dict(color='#dde9ff'),
@@ -106,20 +109,21 @@ if uploaded_file:
             fillcolor='rgba(221,233,255,0.7)',
             hovertemplate='Solar: %{y} MW<extra></extra>'
         ))
-
-        # 3️⃣ Open Position → bianco
+        
+        # 3️⃣ Open Position → bianco (delta tra fabbisogno e copertura totale)
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["Fabbisogno Adjusted"],
+            y=df["Fabbisogno Adjusted"],  # top layer = fabbisogno
             name="Open Position",
             mode='lines',
             line=dict(color='white'),
             fill='tonexty',
             fillcolor='rgba(255,255,255,1)',
-            customdata=df["Open Position w Solar (Adjusted)"],  # qui metti il delta reale
+            customdata=df["Open Position w Solar (Adjusted)"],
             hovertemplate='Open Position: %{customdata} MW<extra></extra>'
         ))
-
+        
+        # Layout
         fig_solar.update_layout(
             title="Scenario con Solar - Grafico ad Aree",
             yaxis_title="MW",
@@ -128,10 +132,10 @@ if uploaded_file:
             hovermode="x unified",
             xaxis=dict(
                 tickformat="%Y",  # Mostra solo l'anno
-                dtick="M12"       # tick ogni 12 mesi
+                dtick="M12"
             )
-                )
-
+        )
+        
         st.plotly_chart(fig_solar, use_container_width=True)
 
         # Download del risultato
