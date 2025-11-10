@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-
+from io import BytesIO
 
 st.set_page_config(page_title="Calcolo Open Position", layout="wide")
 
@@ -51,12 +50,14 @@ if uploaded_file:
         st.subheader("📈 Tabella con Open Position calcolati")
         st.dataframe(df.style.format("{:.0f}"))
 
-        # Calcoli
+        # -----------------------------
+        # Scenario con Solar
+        # -----------------------------
         df["Copertura_totale_con_solar"] = df["PPA_effettivo"] + df["FRW"] + df["Solar"]
         df["OpenPosition_con_solar"] = (df["Fabbisogno Adjusted"] - df["Copertura_totale_con_solar"]).clip(lower=0)
         
         fig_solar = go.Figure()
-        
+
         # Area Fabbisogno Adjusted (sfondo blu)
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
@@ -67,7 +68,7 @@ if uploaded_file:
             fill='tozeroy',
             fillcolor='rgba(0,0,255,0.3)'
         ))
-        
+
         # Coperture stacked
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
@@ -81,7 +82,7 @@ if uploaded_file:
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["PPA_effettivo"] + df["FRW"],
-            name="FRW",
+            name="Forward (FRW)",
             mode='lines',
             line=dict(color='deepskyblue'),
             fill='tonexty',
@@ -96,11 +97,11 @@ if uploaded_file:
             fill='tonexty',
             fillcolor='rgba(255,215,0,0.7)'
         ))
-        
-        # Open Position → spazio bianco sopra copertura fino al fabbisogno
+
+        # Open Position → delta bianco sopra copertura
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["Fabbisogno Adjusted"],  # top layer = fabbisogno
+            y=df["Fabbisogno Adjusted"],
             name="Open Position",
             mode='lines',
             line=dict(color='white'),
@@ -108,14 +109,82 @@ if uploaded_file:
             fillcolor='rgba(255,255,255,1)'
         ))
 
+        fig_solar.update_layout(
+            title="Scenario con Solar - Grafico ad Aree",
+            yaxis_title="MW",
+            xaxis_title="Anno",
+            legend_title="Legenda",
+            hovermode="x unified"
+        )
 
+        st.plotly_chart(fig_solar, use_container_width=True)
+
+        # -----------------------------
+        # Scenario senza Solar
+        # -----------------------------
+        df["Copertura_totale_senza_solar"] = df["PPA_effettivo"] + df["FRW"]
+        df["OpenPosition_senza_solar"] = (df["Fabbisogno Adjusted"] - df["Copertura_totale_senza_solar"]).clip(lower=0)
+
+        fig_no_solar = go.Figure()
+
+        # Area Fabbisogno Adjusted
+        fig_no_solar.add_trace(go.Scatter(
+            x=df["Anno"],
+            y=df["Fabbisogno Adjusted"],
+            name="Fabbisogno Adjusted",
+            mode='lines',
+            line=dict(color='blue'),
+            fill='tozeroy',
+            fillcolor='rgba(0,0,255,0.3)'
+        ))
+
+        # Coperture stacked
+        fig_no_solar.add_trace(go.Scatter(
+            x=df["Anno"],
+            y=df["PPA_effettivo"],
+            name="PPA ERG/Cuscinetto",
+            mode='lines',
+            line=dict(color='green'),
+            fill='tonexty',
+            fillcolor='rgba(0,128,0,0.7)'
+        ))
+        fig_no_solar.add_trace(go.Scatter(
+            x=df["Anno"],
+            y=df["Copertura_totale_senza_solar"],
+            name="Forward (FRW)",
+            mode='lines',
+            line=dict(color='deepskyblue'),
+            fill='tonexty',
+            fillcolor='rgba(135,206,250,0.7)'
+        ))
+
+        # Open Position → delta bianco
+        fig_no_solar.add_trace(go.Scatter(
+            x=df["Anno"],
+            y=df["Fabbisogno Adjusted"],
+            name="Open Position",
+            mode='lines',
+            line=dict(color='white'),
+            fill='tonexty',
+            fillcolor='rgba(255,255,255,1)'
+        ))
+
+        fig_no_solar.update_layout(
+            title="Scenario senza Solar - Grafico ad Aree",
+            yaxis_title="MW",
+            xaxis_title="Anno",
+            legend_title="Legenda",
+            hovermode="x unified"
+        )
+
+        st.plotly_chart(fig_no_solar, use_container_width=True)
+
+        # -----------------------------
         # Download del risultato
-        from io import BytesIO
-
-        # Creiamo un buffer in memoria
+        # -----------------------------
         output_buffer = BytesIO()
         df.to_excel(output_buffer, index=False, engine="openpyxl")
-        output_buffer.seek(0)  # Torniamo all'inizio del buffer
+        output_buffer.seek(0)
 
         st.download_button(
             label="📥 Scarica Excel con risultati",
