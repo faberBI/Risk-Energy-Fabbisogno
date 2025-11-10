@@ -53,7 +53,7 @@ if uploaded_file:
 
         # Grafico ad aree stacked
         fig_solar = go.Figure()
-        
+
         # PPA
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["PPA_effettivo"], 
@@ -80,7 +80,7 @@ if uploaded_file:
             name="Fabbisogno Adjusted", mode='lines+markers',
             line=dict(color='black', dash='dash')
         ))
-        
+
         fig_solar.update_layout(
             title="Scenario: con Solar",
             yaxis_title="MW", xaxis_title="Anno",
@@ -88,11 +88,11 @@ if uploaded_file:
             hovermode="x unified"
         )
         st.plotly_chart(fig_solar, use_container_width=True)
-        
+
         # -------------------------
         st.subheader("📊 Grafico ad aree: Copertura senza Solar")
         fig_no_solar = go.Figure()
-        
+
         # PPA
         fig_no_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["PPA_effettivo"], 
@@ -114,7 +114,7 @@ if uploaded_file:
             name="Fabbisogno Adjusted", mode='lines+markers',
             line=dict(color='black', dash='dash')
         ))
-        
+
         fig_no_solar.update_layout(
             title="Scenario: senza Solar",
             yaxis_title="MW", xaxis_title="Anno",
@@ -124,10 +124,16 @@ if uploaded_file:
         st.plotly_chart(fig_no_solar, use_container_width=True)
         
         # Download del risultato
-        output = df.to_excel(index=False, engine="openpyxl")
+        from io import BytesIO
+
+        # Creiamo un buffer in memoria
+        output_buffer = BytesIO()
+        df.to_excel(output_buffer, index=False, engine="openpyxl")
+        output_buffer.seek(0)  # Torniamo all'inizio del buffer
+        
         st.download_button(
             label="📥 Scarica Excel con risultati",
-            data=output,
+            data=output_buffer,
             file_name="open_position_calcolato.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
