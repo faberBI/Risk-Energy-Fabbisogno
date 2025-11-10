@@ -72,8 +72,8 @@ if uploaded_file:
         # Open Position w Solar
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["Open Position w Solar (Adjusted)"], 
-            name="Open Position", stackgroup='one', mode='none', fillcolor='red'
-        ))
+            name="Open Position", line=dict(color='red', dash='dash'))
+        
         # Linea fabbisogno Adjusted
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["Fabbisogno Adjusted"], 
@@ -106,8 +106,7 @@ if uploaded_file:
         # Open Position w/o Solar
         fig_no_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["Open Position w/o Solar (Adjusted)"], 
-            name="Open Position", stackgroup='one', mode='none', fillcolor='red'
-        ))
+            name="Open Position", line=dict(color='red', dash='dash'))
         # Linea fabbisogno Adjusted
         fig_no_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["Fabbisogno Adjusted"], 
@@ -130,7 +129,7 @@ if uploaded_file:
         output_buffer = BytesIO()
         df.to_excel(output_buffer, index=False, engine="openpyxl")
         output_buffer.seek(0)  # Torniamo all'inizio del buffer
-        
+
         st.download_button(
             label="📥 Scarica Excel con risultati",
             data=output_buffer,
