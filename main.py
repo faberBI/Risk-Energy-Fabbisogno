@@ -113,7 +113,7 @@ if uploaded_file:
             line=dict(color='white'),
             fill='tonexty',
             fillcolor='rgba(255,255,255,1)',
-            hovertemplate='Open Position: %{y - df.Copertura_totale_con_solar} MW<extra></extra>'
+            hovertemplate='Open Position: %{ df['OpenPosition_con_solar']} MW<extra></extra>'
         ))
         
         fig_solar.update_layout(
