@@ -51,15 +51,13 @@ if uploaded_file:
         st.subheader("📈 Tabella con Open Position calcolati")
         st.dataframe(df.style.format("{:.0f}"))
 
-        # -----------------------------
-        # Scenario con Solar
-        # -----------------------------
+        # Calcoli
         df["Copertura_totale_con_solar"] = df["PPA_effettivo"] + df["FRW"] + df["Solar"]
         df["OpenPosition_con_solar"] = (df["Fabbisogno Adjusted"] - df["Copertura_totale_con_solar"]).clip(lower=0)
         
         fig_solar = go.Figure()
         
-        # Area Fabbisogno Adjusted (sfondo pieno blu)
+        # Area Fabbisogno Adjusted (sfondo blu)
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["Fabbisogno Adjusted"],
@@ -67,8 +65,7 @@ if uploaded_file:
             mode='lines',
             line=dict(color='blue'),
             fill='tozeroy',
-            fillcolor='rgba(0, 0, 255, 0.4)',
-            hovertemplate='Fabbisogno Adjusted: %{y} MW<extra></extra>'
+            fillcolor='rgba(0,0,255,0.3)'
         ))
         
         # Coperture stacked
@@ -79,18 +76,16 @@ if uploaded_file:
             mode='lines',
             line=dict(color='green'),
             fill='tonexty',
-            fillcolor='rgba(0, 128, 0, 0.7)',
-            hovertemplate='PPA: %{y} MW<extra></extra>'
+            fillcolor='rgba(0,128,0,0.7)'
         ))
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["PPA_effettivo"] + df["FRW"],
-            name="Forward (FRW)",
+            name="FRW",
             mode='lines',
             line=dict(color='deepskyblue'),
             fill='tonexty',
-            fillcolor='rgba(135, 206, 250, 0.8)',
-            hovertemplate='FRW: %{y} MW<extra></extra>'
+            fillcolor='rgba(135,206,250,0.7)'
         ))
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
@@ -99,30 +94,20 @@ if uploaded_file:
             mode='lines',
             line=dict(color='gold'),
             fill='tonexty',
-            fillcolor='rgba(255, 215, 0, 0.8)',
-            hovertemplate='Solar: %{y} MW<extra></extra>'
+            fillcolor='rgba(255,215,0,0.7)'
         ))
         
-        # Open Position → spazio bianco
+        # Open Position → spazio bianco sopra copertura fino al fabbisogno
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["Copertura_totale_con_solar"] + df["OpenPosition_con_solar"],
+            y=df["Fabbisogno Adjusted"],  # top layer = fabbisogno
             name="Open Position",
             mode='lines',
             line=dict(color='white'),
             fill='tonexty',
-            fillcolor='rgba(255,255,255,1)',
-            hovertemplate='Open Position: %{y} MW<extra></extra>'
+            fillcolor='rgba(255,255,255,1)'
         ))
-        
-        fig_solar.update_layout(
-            title="Scenario con Solar - Grafico ad Aree",
-            yaxis_title="MW",
-            xaxis_title="Anno",
-            legend_title="Legenda",
-            hovermode="x unified"
-        )
-        st.plotly_chart(fig_solar, use_container_width=True)
+
 
         # Download del risultato
         from io import BytesIO
