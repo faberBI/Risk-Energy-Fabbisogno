@@ -72,7 +72,7 @@ if uploaded_file:
         # Open Position w Solar
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["Open Position w Solar (Adjusted)"], 
-            name="Open Position", line=dict(color='red', dash='dash'))
+            name="Open Position", line=dict(color='red', dash='dash')))
         
         # Linea fabbisogno Adjusted
         fig_solar.add_trace(go.Scatter(
@@ -106,7 +106,8 @@ if uploaded_file:
         # Open Position w/o Solar
         fig_no_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["Open Position w/o Solar (Adjusted)"], 
-            name="Open Position", line=dict(color='red', dash='dash'))
+            name="Open Position", line=dict(color='red', dash='dash')))
+
         # Linea fabbisogno Adjusted
         fig_no_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["Fabbisogno Adjusted"], 
