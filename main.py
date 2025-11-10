@@ -51,76 +51,103 @@ if uploaded_file:
         st.subheader("📈 Tabella con Open Position calcolati")
         st.dataframe(df.style.format("{:.0f}"))
 
-        # Grafico ad aree stacked
+        # -------------------------
+        # Grafico con Solar
+        st.subheader("📊 Scenario: con Solar")
+        
+        # Calcolo copertura totale
+        df["Copertura_totale_con_solar"] = df["PPA_effettivo"] + df["FRW"] + df["Solar"]
+        
         fig_solar = go.Figure()
-
-        # PPA
+        
+        # Aree stacked: PPA, FRW, Solar
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["PPA_effettivo"], 
             name="PPA ERG/Cuscinetto", stackgroup='one', mode='none', fillcolor='lightblue'
         ))
-        # FRW
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["FRW"], 
             name="FRW", stackgroup='one', mode='none', fillcolor='orange'
         ))
-        # Solar
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["Solar"], 
             name="Solar", stackgroup='one', mode='none', fillcolor='yellow'
         ))
-        # Open Position w Solar
-        fig_solar.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Open Position w Solar (Adjusted)"], 
-            name="Open Position", line=dict(color='red', dash='dash')))
         
-        # Linea fabbisogno Adjusted
+        # Open Position come area tratteggiata rossa
         fig_solar.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Fabbisogno Adjusted"], 
-            name="Fabbisogno Adjusted", mode='lines+markers',
+            x=df["Anno"],
+            y=df["Fabbisogno Adjusted"],
+            name="Open Position",
+            mode='lines',
+            line=dict(color='red', dash='dash'),
+            fill='tonexty',  # riempie l'area tra questa trace e la precedente
+            fillcolor='rgba(255,0,0,0.3)'  # rosso trasparente
+        ))
+        
+        # Linea di riferimento fabbisogno Adjusted (opzionale)
+        fig_solar.add_trace(go.Scatter(
+            x=df["Anno"], y=df["Fabbisogno Adjusted"],
+            name="Fabbisogno Adjusted",
+            mode='lines',
             line=dict(color='black', dash='dash')
         ))
-
+        
         fig_solar.update_layout(
-            title="Scenario: con Solar",
+            title="Copertura con Solar",
             yaxis_title="MW", xaxis_title="Anno",
             legend_title="Legenda",
             hovermode="x unified"
         )
+        
         st.plotly_chart(fig_solar, use_container_width=True)
-
+        
+        
         # -------------------------
-        st.subheader("📊 Grafico ad aree: Copertura senza Solar")
+        # Grafico senza Solar
+        st.subheader("📊 Scenario: senza Solar")
+        
+        # Calcolo copertura totale senza Solar
+        df["Copertura_totale_senza_solar"] = df["PPA_effettivo"] + df["FRW"]
+        
         fig_no_solar = go.Figure()
-
-        # PPA
+        
+        # Aree stacked: PPA, FRW
         fig_no_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["PPA_effettivo"], 
             name="PPA ERG/Cuscinetto", stackgroup='one', mode='none', fillcolor='lightblue'
         ))
-        # FRW
         fig_no_solar.add_trace(go.Scatter(
             x=df["Anno"], y=df["FRW"], 
             name="FRW", stackgroup='one', mode='none', fillcolor='orange'
         ))
-        # Open Position w/o Solar
+        
+        # Open Position come area tratteggiata rossa
         fig_no_solar.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Open Position w/o Solar (Adjusted)"], 
-            name="Open Position", line=dict(color='red', dash='dash')))
-
-        # Linea fabbisogno Adjusted
+            x=df["Anno"],
+            y=df["Fabbisogno Adjusted"],
+            name="Open Position",
+            mode='lines',
+            line=dict(color='red', dash='dash'),
+            fill='tonexty',  # riempie l'area tra questa trace e la precedente
+            fillcolor='rgba(255,0,0,0.3)'  # rosso trasparente
+        ))
+        
+        # Linea di riferimento fabbisogno Adjusted
         fig_no_solar.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Fabbisogno Adjusted"], 
-            name="Fabbisogno Adjusted", mode='lines+markers',
+            x=df["Anno"], y=df["Fabbisogno Adjusted"],
+            name="Fabbisogno Adjusted",
+            mode='lines',
             line=dict(color='black', dash='dash')
         ))
-
+        
         fig_no_solar.update_layout(
-            title="Scenario: senza Solar",
+            title="Copertura senza Solar",
             yaxis_title="MW", xaxis_title="Anno",
             legend_title="Legenda",
             hovermode="x unified"
         )
+        
         st.plotly_chart(fig_no_solar, use_container_width=True)
         
         # Download del risultato
