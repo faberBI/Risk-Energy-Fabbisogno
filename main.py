@@ -125,8 +125,11 @@ if uploaded_file:
             yaxis_title="MW",
             xaxis_title="Anno",
             legend_title="Legenda",
-            hovermode="x unified"
-        )
+            hovermode="x unified",
+            xaxis=dict(
+                tickformat="%Y",
+                dtick="M12"
+                            ))
 
         st.plotly_chart(fig_solar, use_container_width=True)
 
