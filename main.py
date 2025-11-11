@@ -67,9 +67,9 @@ if uploaded_file:
             y=df["Fabbisogno Adjusted"],
             name="Fabbisogno Adjusted",
             mode='lines',
-            line=dict(color='#00196c'),
+            line=dict(color='rgba(0, 25, 108, 1)', width=3),
             fill='tozeroy',
-            fillcolor='rgba(0,25,108,0.3)',
+            fillcolor='rgba(0, 25, 108, 0.3)',
             hovertemplate='Fabbisogno Adjusted: %{y} Gwh<extra></extra>'
         ))
         
@@ -80,9 +80,9 @@ if uploaded_file:
             y=df["PPA_cum"],
             name="PPA ERG/Cuscinetto",
             mode='lines',
-            line=dict(color='#94dcf8'),
+            line=dict(color='rgba(0, 176, 80, 0.6)'),
             fill='tonexty',
-            fillcolor='rgba(148,220,248,0.7)',
+            line=dict(color='rgba(0, 176, 80, 0.6)'),
             hovertemplate='PPA: %{y} Gwh<extra></extra>'
         ))
         # FRW
@@ -91,9 +91,9 @@ if uploaded_file:
             y=df["FRW_cum"],
             name="FRW",
             mode='lines',
-            line=dict(color='#003caa'),
+            line=dict(color='rgba(0, 176, 80, 0.8)'),
             fill='tonexty',
-            fillcolor='rgba(0,60,170,0.7)',
+            fillcolor='rgba(0, 176, 80, 0.5)',
             hovertemplate='FRW: %{y} Gwh<extra></extra>'
         ))
         # Solar
@@ -102,9 +102,9 @@ if uploaded_file:
             y=df["Solar_cum"],
             name="Solar",
             mode='lines',
-            line=dict(color='#dde9ff'),
+            line=dict(color='rgba(0, 176, 80, 1)'),
             fill='tonexty',
-            fillcolor='rgba(221,233,255,0.7)',
+            fillcolor='rgba(0, 176, 80, 0.7)',
             hovertemplate='Solar: %{y} Gwh<extra></extra>'
         ))
         
