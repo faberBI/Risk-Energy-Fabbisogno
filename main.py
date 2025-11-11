@@ -138,18 +138,16 @@ if uploaded_file:
         
         df['Anno'] = df['Anno'].dt.year        
         # Layout
+
         fig.update_layout(
-        title='Fabbisogno vs Coperture Totali',
-        xaxis_title='Anno',
-        yaxis_title='Energia (GWh)',
-        hovermode='x unified',
-        plot_bgcolor='white',
-        paper_bgcolor='white',
-        legend_title='Legenda',
-        xaxis=dict(
-        type='category',  # forza solo valori discreti
-        tickmode='linear'  # mostra ogni anno
-        ))
+            title="Confronto Scenari Secure vs Top - Coperture e Open Position",
+            yaxis_title="GWh",
+            xaxis_title="Anno",
+            legend_title="Legenda",
+            hovermode="x unified",
+            xaxis=dict(tickformat="%Y", dtick="M12"),
+            plot_bgcolor="white"
+        )
         
         st.plotly_chart(fig, use_container_width=True)
 
