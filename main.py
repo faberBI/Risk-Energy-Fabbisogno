@@ -48,12 +48,12 @@ if uploaded_file:
         df["PPA_cum_secure"] = df["PPA ERG secure"]
         df["PPA_cum_top"] = df["PPA ERG Top"]
 
-        df["Coperture Secure"] = df["PPA ERG secure"] + df["FRW"] + df["Solar"]
-        df["Coperture Top"] = df["PPA ERG Top"] + df["FRW"] + df["Solar"]
+        df["Coperture secure"] = df["PPA ERG secure"] + df["FRW"] + df["Solar"]
+        df["Coperture top"] = df["PPA ERG Top"] + df["FRW"] + df["Solar"]
 
         # Open position
-        df["Open Position Secure"] = df["Fabbisogno Adjusted"] - df["Coperture Secure"]
-        df["Open Position Top"] = df["Fabbisogno Adjusted"] - df["Coperture Top"]
+        df["Open Position Secure"] = df["Fabbisogno Adjusted"] - df["Coperture secure"]
+        df["Open Position Top"] = df["Fabbisogno Adjusted"] - df["Coperture top"]
 
         st.success("✅ Calcolo completato!")
 
@@ -61,7 +61,7 @@ if uploaded_file:
         st.dataframe(df.style.format("{:.0f}"))
 
         df["Anno"] = pd.to_datetime(df["Anno"], format="%Y")
-
+        
         fig = go.Figure()
 
         # 1️⃣ Fabbisogno Adjusted (area totale)
@@ -84,57 +84,63 @@ if uploaded_file:
             hovertemplate="Fabbisogno Reale: %{y} GWh<extra></extra>"
         ))
 
-        # 3️⃣ Copertura Secure (stacked verde)
+        # 3️⃣ Copertura Secure (stacked usando stackgroup)
         fig.add_trace(go.Scatter(
             x=df["Anno"], y=df["PPA ERG secure"],
             name="PPA ERG Secure",
             mode="lines",
             line=dict(color="rgba(0,100,0,1)", width=1.5),
-            fill="tozeroy",
-            fillcolor="rgba(0,100,0,0.6)",
+            stackgroup='secure',
             hovertemplate="PPA Secure: %{y} GWh<extra></extra>"
         ))
 
         fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["PPA ERG secure"] + df["FRW"],
+            x=df["Anno"], y=df["FRW"],
             name="FRW",
             mode="lines",
             line=dict(color="rgba(144,238,144,1)", width=1.5),
-            fill="tonexty",
-            fillcolor="rgba(144,238,144,0.6)",
+            stackgroup='secure',
             hovertemplate="FRW: %{y} GWh<extra></extra>"
         ))
 
         fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Coperture Secure"],
+            x=df["Anno"], y=df["Solar"],
             name="Solar",
             mode="lines",
             line=dict(color="rgba(0,128,0,1)", width=1.5),
-            fill="tonexty",
-            fillcolor="rgba(0,128,0,0.6)",
+            stackgroup='secure',
             hovertemplate="Solar: %{y} GWh<extra></extra>"
         ))
 
-        # 4️⃣ Copertura Top (tratteggiata verde, solo contorno PPA cambia)
+        # ✅ Copertura Secure totale (linea contorno)
+        fig.add_trace(go.Scatter(
+            x=df["Anno"], y=df["Coperture Secure"],
+            name="Copertura Secure",
+            mode="lines",
+            line=dict(color="rgba(0,100,0,1)", width=2, dash="dot"),
+            hovertemplate="Copertura Secure Totale: %{y} GWh<extra></extra>"
+        ))
+
+        # 4️⃣ Copertura Top (tratteggiata verde)
         fig.add_trace(go.Scatter(
             x=df["Anno"], y=df["Coperture Top"],
             name="Copertura Top",
             mode="lines",
             line=dict(color="rgba(34,139,34,1)", width=2, dash="dot"),
-            hovertemplate="Copertura Top: %{y} GWh<extra></extra>"
+            hovertemplate="Copertura Totale Top: %{y} GWh<extra></extra>"
         ))
 
-        # 5️⃣ Open Position Secure (area residua)
+        # 5️⃣ Open Position Secure (area residua sopra)
         fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Fabbisogno Adjusted"],
+            x=df["Anno"], y=df["Open Position Secure"],
             name="Open Position Secure",
             mode="lines",
             line=dict(color="white", width=1.5),
             fill="tonexty",
             fillcolor="rgba(255,255,255,0.8)",
-            customdata=df["Open Position Secure"],
-            hovertemplate="Open Position Secure: %{customdata} GWh<extra></extra>"
+            hovertemplate="Open Position Secure: %{y} GWh<extra></extra>"
         ))
+
 
         # Layout
         fig.update_layout(
