@@ -95,7 +95,7 @@ if uploaded_file:
         ))
         
         fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["PPA ERG secure"] + df["FRW"],
+            x=df["Anno"], y= df["FRW"],
             name="FRW",
             mode="lines",
             line=dict(color="rgba(0,150,255,1)", width=1.5),
@@ -104,7 +104,7 @@ if uploaded_file:
             hovertemplate="FRW: %{y} GWh<extra></extra>"
         ))
         fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Coperture secure"],
+            x=df["Anno"], y=df["Solar"],
             name="Solar",
             mode="lines",
             line=dict(color="rgba(255,140,0,1)", width=1.5),
