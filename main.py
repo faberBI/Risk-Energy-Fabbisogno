@@ -62,7 +62,7 @@ if uploaded_file:
         # --- Grafico con Plotly ---
         fig_solar = go.Figure()
 
-        # 1️⃣ Fabbisogno Adjusted → blu scuro
+        # 1️⃣ Fabbisogno Adjusted → blu scuro (sfondo)
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["Fabbisogno Adjusted"],
@@ -74,19 +74,7 @@ if uploaded_file:
             hovertemplate='Fabbisogno Adjusted: %{y} GWh<extra></extra>'
         ))
 
-        # 1️⃣.5️⃣ Fabbisogno → blu medio (nuovo layer)
-        fig_solar.add_trace(go.Scatter(
-            x=df["Anno"],
-            y=df["Fabbisogno"],
-            name="Fabbisogno",
-            mode='lines',
-            line=dict(color='rgba(0, 60, 170, 1)', width=2, dash='dash'),
-            fill=None,
-            hovertemplate='Fabbisogno: %{y} GWh<extra></extra>'
-        ))
-
         # 2️⃣ Coperture stacked (verde)
-        # PPA
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["PPA_cum"],
@@ -97,7 +85,6 @@ if uploaded_file:
             fillcolor='rgba(0, 176, 80, 0.3)',
             hovertemplate='PPA: %{y} GWh<extra></extra>'
         ))
-        # FRW
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["FRW_cum"],
@@ -108,7 +95,6 @@ if uploaded_file:
             fillcolor='rgba(0, 176, 80, 0.5)',
             hovertemplate='FRW: %{y} GWh<extra></extra>'
         ))
-        # Solar
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["Solar_cum"],
@@ -131,6 +117,17 @@ if uploaded_file:
             fillcolor='rgba(255,255,255,1)',
             customdata=df["Open Position w Solar (Adjusted)"],
             hovertemplate='Open Position: %{customdata} GWh<extra></extra>'
+        ))
+
+        # 4️⃣ Fabbisogno reale → blu medio tratteggiato (BRING TO FRONT)
+        fig_solar.add_trace(go.Scatter(
+            x=df["Anno"],
+            y=df["Fabbisogno"],
+            name="Fabbisogno (Reale)",
+            mode='lines',
+            line=dict(color='rgba(0, 60, 170, 1)', width=3, dash='dash'),
+            fill=None,
+            hovertemplate='Fabbisogno: %{y} GWh<extra></extra>'
         ))
 
         # Layout grafico
