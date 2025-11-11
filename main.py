@@ -10,144 +10,177 @@ st.title("📊 Analisi Fabbisogno Year by Year")
 
 st.markdown("""
 Carica un file Excel con la seguente struttura (colonne):
-**Anno, Fabbisogno Adjusted, Fabbisogno, PPA ERG, PPA ERG cuscinetto, FRW, Solar**
+**Anno, Fabbisogno Adjusted, Fabbisogno, PPA ERG secure, PPA ERG baseline, PPA ERG Top, FRW, Solar**
 """)
 
-# Upload file
 uploaded_file = st.file_uploader("📂 Carica file Excel", type=["xlsx"])
 
 if uploaded_file:
-    # Legge il file Excel
     df = pd.read_excel(uploaded_file)
 
-    # Controllo colonne richieste
     required_cols = ["Anno", "Fabbisogno Adjusted", "Fabbisogno", 
-                     "PPA ERG", "PPA ERG cuscinetto", "FRW", "Solar"]
+                     "PPA ERG secure", "PPA ERG baseline", "PPA ERG Top", "FRW", "Solar"]
     missing = [c for c in required_cols if c not in df.columns]
-    
+
     if missing:
         st.error(f"Mancano le colonne obbligatorie: {', '.join(missing)}")
     else:
-        # PPA effettivo = usa PPA ERG cuscinetto se presente, altrimenti PPA ERG
-        df["PPA_effettivo"] = df["PPA ERG cuscinetto"].fillna(df["PPA ERG"])
+        # --- Calcoli principali ---
+        # Scenario Secure
+        df["Open Position w Solar (Adjusted) secure"] = (
+            df["Fabbisogno Adjusted"] - (df["PPA ERG secure"] + df["FRW"] + df["Solar"])
+        )
 
-        # Calcolo Open Position (Adjusted e No Adjusted)
-        df["Open Position w Solar (Adjusted)"] = (
-            df["Fabbisogno Adjusted"] - (df["PPA_effettivo"] + df["FRW"] + df["Solar"])
+        # Scenario Top
+        df["Open Position w Solar (Adjusted) top"] = (
+            df["Fabbisogno Adjusted"] - (df["PPA ERG Top"] + df["FRW"] + df["Solar"])
         )
-        df["Open Position w/o Solar (Adjusted)"] = (
-            df["Fabbisogno Adjusted"] - (df["PPA_effettivo"] + df["FRW"])
-        )
-        df["Open Position w Solar (No Adjusted)"] = (
-            df["Fabbisogno"] - (df["PPA_effettivo"] + df["FRW"] + df["Solar"])
-        )
-        df["Open Position w/o Solar (No Adjusted)"] = (
-            df["Fabbisogno"] - (df["PPA_effettivo"] + df["FRW"])
-        )
+
+        # Cumulativi
+        df["PPA_cum_secure"] = df["PPA ERG secure"]
+        df["FRW_cum_secure"] = df["PPA ERG secure"] + df["FRW"]
+        df["Solar_cum_secure"] = df["PPA ERG secure"] + df["FRW"] + df["Solar"]
+
+        df["PPA_cum_top"] = df["PPA ERG Top"]
+        df["FRW_cum_top"] = df["PPA ERG Top"] + df["FRW"]
+        df["Solar_cum_top"] = df["PPA ERG Top"] + df["FRW"] + df["Solar"]
 
         st.success("✅ Calcolo completato!")
 
-        # Mostra tabella con risultati
         st.subheader("📈 Tabella con Open Position calcolati")
         st.dataframe(df.style.format("{:.0f}"))
 
-        # Conversione "Anno" in datetime (solo anno)
         df["Anno"] = pd.to_datetime(df["Anno"], format="%Y")
 
-        # Calcolo cumulativi per stacking
-        df["PPA_cum"] = df["PPA_effettivo"]
-        df["FRW_cum"] = df["PPA_effettivo"] + df["FRW"]
-        df["Solar_cum"] = df["PPA_effettivo"] + df["FRW"] + df["Solar"]
+        # --- Costruzione grafico ---
+        fig = go.Figure()
 
-        # --- Grafico con Plotly ---
-        fig_solar = go.Figure()
-
-        # 1️⃣ Fabbisogno Adjusted → blu scuro (sfondo)
-        fig_solar.add_trace(go.Scatter(
+        # 1️⃣ Fabbisogno Adjusted
+        fig.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["Fabbisogno Adjusted"],
             name="Fabbisogno Adjusted",
-            mode='lines',
-            line=dict(color='rgba(0, 25, 108, 1)', width=3),
-            fill='tozeroy',
-            fillcolor='rgba(0, 25, 108, 0.3)',
-            hovertemplate='Fabbisogno Adjusted: %{y} GWh<extra></extra>'
+            mode="lines",
+            line=dict(color="rgba(0, 25, 108, 1)", width=3),
+            fill="tozeroy",
+            fillcolor="rgba(0, 25, 108, 0.3)",
+            hovertemplate="Fabbisogno Adjusted: %{y} GWh<extra></extra>"
         ))
 
-        # 2️⃣ Coperture stacked (verde brillante con differenze più marcate)
-        fig_solar.add_trace(go.Scatter(
+        # 2️⃣ Coperture SCENARIO SECURE
+        fig.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["PPA_cum"],
-            name="PPA ERG/Cuscinetto",
-            mode='lines',
-            line=dict(color='rgba(0, 120, 0, 1)', width=2),
-            fill='tonexty',
-            fillcolor='rgba(0, 120, 0, 0.4)',
-            hovertemplate='PPA: %{y} GWh<extra></extra>'
+            y=df["PPA_cum_secure"],
+            name="PPA Secure",
+            mode="lines",
+            line=dict(color="rgba(0, 100, 0, 1)", width=2),
+            fill="tonexty",
+            fillcolor="rgba(0, 100, 0, 0.4)",
+            hovertemplate="PPA Secure: %{y} GWh<extra></extra>"
         ))
-        fig_solar.add_trace(go.Scatter(
+        fig.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["FRW_cum"],
-            name="FRW",
-            mode='lines',
-            line=dict(color='rgba(0, 160, 0, 1)', width=2),
-            fill='tonexty',
-            fillcolor='rgba(0, 160, 0, 0.5)',
-            hovertemplate='FRW: %{y} GWh<extra></extra>'
+            y=df["FRW_cum_secure"],
+            name="FRW Secure",
+            mode="lines",
+            line=dict(color="rgba(0, 150, 0, 1)", width=2),
+            fill="tonexty",
+            fillcolor="rgba(0, 150, 0, 0.5)",
+            hovertemplate="FRW Secure: %{y} GWh<extra></extra>"
         ))
-        fig_solar.add_trace(go.Scatter(
+        fig.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["Solar_cum"],
-            name="Solar",
-            mode='lines',
-            line=dict(color='rgba(0, 200, 0, 1)', width=2),
-            fill='tonexty',
-            fillcolor='rgba(0, 200, 0, 0.6)',
-            hovertemplate='Solar: %{y} GWh<extra></extra>'
+            y=df["Solar_cum_secure"],
+            name="Solar Secure",
+            mode="lines",
+            line=dict(color="rgba(0, 180, 0, 1)", width=2),
+            fill="tonexty",
+            fillcolor="rgba(0, 180, 0, 0.6)",
+            hovertemplate="Solar Secure: %{y} GWh<extra></extra>"
         ))
 
-        # 3️⃣ Open Position → bianco
-        fig_solar.add_trace(go.Scatter(
+        # 3️⃣ Coperture SCENARIO TOP (più alte e più chiare)
+        fig.add_trace(go.Scatter(
+            x=df["Anno"],
+            y=df["PPA_cum_top"],
+            name="PPA Top",
+            mode="lines",
+            line=dict(color="rgba(0, 140, 70, 1)", width=2),
+            fill="tonexty",
+            fillcolor="rgba(0, 140, 70, 0.3)",
+            hovertemplate="PPA Top: %{y} GWh<extra></extra>"
+        ))
+        fig.add_trace(go.Scatter(
+            x=df["Anno"],
+            y=df["FRW_cum_top"],
+            name="FRW Top",
+            mode="lines",
+            line=dict(color="rgba(0, 180, 80, 1)", width=2),
+            fill="tonexty",
+            fillcolor="rgba(0, 180, 80, 0.4)",
+            hovertemplate="FRW Top: %{y} GWh<extra></extra>"
+        ))
+        fig.add_trace(go.Scatter(
+            x=df["Anno"],
+            y=df["Solar_cum_top"],
+            name="Solar Top",
+            mode="lines",
+            line=dict(color="rgba(0, 220, 100, 1)", width=2),
+            fill="tonexty",
+            fillcolor="rgba(0, 220, 100, 0.5)",
+            hovertemplate="Solar Top: %{y} GWh<extra></extra>"
+        ))
+
+        # 4️⃣ Open Position Secure (bianco)
+        fig.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["Fabbisogno Adjusted"],
-            name="Open Position",
-            mode='lines',
-            line=dict(color='white', width=2),
-            fill='tonexty',
-            fillcolor='rgba(255,255,255,1)',
-            customdata=df["Open Position w Solar (Adjusted)"],
-            hovertemplate='Open Position: %{customdata} GWh<extra></extra>'
+            name="Open Position Secure",
+            mode="lines",
+            line=dict(color="white", width=2),
+            fill="tonexty",
+            fillcolor="rgba(255,255,255,1)",
+            customdata=df["Open Position w Solar (Adjusted) secure"],
+            hovertemplate="Open Position Secure: %{customdata} GWh<extra></extra>"
         ))
 
-        # 4️⃣ Fabbisogno reale → blu medio tratteggiato (BRING TO FRONT)
-        fig_solar.add_trace(go.Scatter(
+        # 5️⃣ Open Position Top (grigio chiaro)
+        fig.add_trace(go.Scatter(
+            x=df["Anno"],
+            y=df["Fabbisogno Adjusted"],
+            name="Open Position Top",
+            mode="lines",
+            line=dict(color="rgba(200,200,200,1)", width=2),
+            fill="tonexty",
+            fillcolor="rgba(220,220,220,0.6)",
+            customdata=df["Open Position w Solar (Adjusted) top"],
+            hovertemplate="Open Position Top: %{customdata} GWh<extra></extra>"
+        ))
+
+        # 6️⃣ Fabbisogno Reale → blu tratteggiato sopra tutto
+        fig.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["Fabbisogno"],
             name="Fabbisogno (Reale)",
-            mode='lines',
-            line=dict(color='rgba(0, 60, 170, 1)', width=3, dash='dash'),
-            fill=None,
-            hovertemplate='Fabbisogno: %{y} GWh<extra></extra>'
+            mode="lines",
+            line=dict(color="rgba(0, 60, 170, 1)", width=3, dash="dash"),
+            hovertemplate="Fabbisogno: %{y} GWh<extra></extra>"
         ))
 
-        # Layout grafico
-        fig_solar.update_layout(
-            title="Scenario con Solar - Grafico ad Aree",
+        # Layout
+        fig.update_layout(
+            title="Confronto Scenari Secure vs Top - Coperture e Open Position",
             yaxis_title="GWh",
             xaxis_title="Anno",
             legend_title="Legenda",
             hovermode="x unified",
-            xaxis=dict(
-                tickformat="%Y",
-                dtick="M12"
-            ),
+            xaxis=dict(tickformat="%Y", dtick="M12"),
             plot_bgcolor="white"
         )
 
-        # Mostra grafico
-        st.plotly_chart(fig_solar, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True)
 
-        # --- Download Excel risultato ---
+        # --- Download Excel ---
         output_buffer = BytesIO()
         df.to_excel(output_buffer, index=False, engine="openpyxl")
         output_buffer.seek(0)
@@ -155,7 +188,7 @@ if uploaded_file:
         st.download_button(
             label="📥 Scarica Excel con risultati",
             data=output_buffer,
-            file_name="open_position_calcolato.xlsx",
+            file_name="open_position_secure_vs_top.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
