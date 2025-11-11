@@ -26,14 +26,22 @@ if uploaded_file:
         st.error(f"Mancano le colonne obbligatorie: {', '.join(missing)}")
     else:
         # --- Calcoli principali ---
-        # Scenario Secure
+        # Scenario Secure with solar
         df["Open Position w Solar (Adjusted) secure"] = (
             df["Fabbisogno Adjusted"] - (df["PPA ERG secure"] + df["FRW"] + df["Solar"])
         )
 
-        # Scenario Top
+        # Scenario Top with solar
         df["Open Position w Solar (Adjusted) top"] = (
             df["Fabbisogno Adjusted"] - (df["PPA ERG Top"] + df["FRW"] + df["Solar"])
+        )
+        # Scenario secure w/o solar
+        df["Open Position w/o Solar (Adjusted) secure"] = (
+            df["Fabbisogno Adjusted"] - (df["PPA ERG secure"] + df["FRW"])
+        )
+        # Scenario top w/o solar
+        df["Open Position w/o Solar (Adjusted) top"] = (
+            df["Fabbisogno Adjusted"] - (df["PPA ERG Top"] + df["FRW"])
         )
 
         # Cumulativi
