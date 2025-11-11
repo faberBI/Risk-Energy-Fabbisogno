@@ -82,6 +82,15 @@ if uploaded_file:
             stackgroup='secure',  # <-- qui
             hovertemplate='PPA ERG Secure: %{y} GWh<extra></extra>'
         ))
+# al massimo lo tolgo
+        fig.add_trace(go.Scatter(
+            x=df['Anno'], y=df['PPA ERG top'],
+            name='PPA ERG Top',
+            mode='lines',
+            line=dict(width=0.5, color='#A3C4DC'),
+            stackgroup='secure',  # <-- qui
+            hovertemplate='PPA ERG Secure: %{y} GWh<extra></extra>'
+        ))
         
         fig.add_trace(go.Scatter(
             x=df['Anno'], y=df['FRW'],
