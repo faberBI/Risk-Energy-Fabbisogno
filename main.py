@@ -84,7 +84,7 @@ if uploaded_file:
         ))
 # al massimo lo tolgo
         fig.add_trace(go.Scatter(
-            x=df['Anno'], y=df['PPA ERG top'],
+            x=df['Anno'], y=df['PPA ERG Top'],
             name='PPA ERG Top',
             mode='lines',
             line=dict(width=0.5, color='#A3C4DC'),
