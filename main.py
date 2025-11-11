@@ -106,11 +106,20 @@ if uploaded_file:
         # Linee Fabbisogno e Top
         fig.add_trace(go.Scatter(
             x=df['Anno'], y=df['Fabbisogno Adjusted'],
-            name='Fabbisogno Totale',
+            name='Fabbisogno Adjusted',
             mode='lines',
             line=dict(color='black', width=2),
             hovertemplate='Fabbisogno Totale: %{y} GWh<extra></extra>'
         ))
+                # Linee Fabbisogno e Top
+        fig.add_trace(go.Scatter(
+            x=df['Anno'], 
+            y=df['Fabbisogno'],
+            name='Fabbisogno',
+            mode='lines',
+            line=dict(color='blue', width=2, dash='dashdot'),  # linea blu tratteggiata
+            hovertemplate='Fabbisogno Totale: %{y} GWh<extra></extra>'
+            ))
         
         fig.add_trace(go.Scatter(
             x=df['Anno'], y=df['Coperture Top'],
