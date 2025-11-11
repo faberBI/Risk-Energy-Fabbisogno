@@ -62,102 +62,90 @@ if uploaded_file:
 
         df["Anno"] = pd.to_datetime(df["Anno"], format="%Y")
 
-        # --- Costruzione grafico ---
         fig = go.Figure()
 
-        # 🔵 Fabbisogno Adjusted
+        # 1️⃣ Fabbisogno Adjusted (area totale)
         fig.add_trace(go.Scatter(
             x=df["Anno"], y=df["Fabbisogno Adjusted"],
             name="Fabbisogno Adjusted",
             mode="lines",
-            line=dict(color="rgba(0,25,108,1)", width=3),
+            line=dict(color="rgba(173,216,230,1)", width=2),
+            fill="tozeroy",
+            fillcolor="rgba(173,216,230,0.3)",
             hovertemplate="Fabbisogno Adjusted: %{y} GWh<extra></extra>"
         ))
 
-        # 🔵 Fabbisogno Reale
+        # 2️⃣ Fabbisogno Reale (tratteggiato)
         fig.add_trace(go.Scatter(
             x=df["Anno"], y=df["Fabbisogno"],
-            name="Fabbisogno (Reale)",
+            name="Fabbisogno Reale",
             mode="lines",
-            line=dict(color="rgba(0,60,170,1)", width=3, dash="dash"),
-            hovertemplate="Fabbisogno: %{y} GWh<extra></extra>"
+            line=dict(color="rgba(0,60,170,1)", width=2, dash="dash"),
+            hovertemplate="Fabbisogno Reale: %{y} GWh<extra></extra>"
         ))
 
-        # 🟡 Coperture Secure - PPA + FRW + Solar (stackate)
+        # 3️⃣ Copertura Secure (stacked verde)
         fig.add_trace(go.Scatter(
             x=df["Anno"], y=df["PPA ERG secure"],
             name="PPA ERG Secure",
             mode="lines",
-            line=dict(color="rgba(255,200,0,1)", width=1.5),
+            line=dict(color="rgba(0,100,0,1)", width=1.5),
             fill="tozeroy",
-            fillcolor="rgba(255,200,0,0.5)",
-            hovertemplate="PPA ERG Secure: %{y} GWh<extra></extra>"
+            fillcolor="rgba(0,100,0,0.6)",
+            hovertemplate="PPA Secure: %{y} GWh<extra></extra>"
         ))
-        
+
         fig.add_trace(go.Scatter(
-            x=df["Anno"], y= df["FRW"],
+            x=df["Anno"], y=df["PPA ERG secure"] + df["FRW"],
             name="FRW",
             mode="lines",
-            line=dict(color="rgba(0,150,255,1)", width=1.5),
+            line=dict(color="rgba(144,238,144,1)", width=1.5),
             fill="tonexty",
-            fillcolor="rgba(0,150,255,0.4)",
+            fillcolor="rgba(144,238,144,0.6)",
             hovertemplate="FRW: %{y} GWh<extra></extra>"
         ))
+
         fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Solar"],
+            x=df["Anno"], y=df["Copertura Secure"],
             name="Solar",
             mode="lines",
-            line=dict(color="rgba(255,140,0,1)", width=1.5),
+            line=dict(color="rgba(0,128,0,1)", width=1.5),
             fill="tonexty",
-            fillcolor="rgba(255,140,0,0.4)",
+            fillcolor="rgba(0,128,0,0.6)",
             hovertemplate="Solar: %{y} GWh<extra></extra>"
         ))
 
-        # 🔶 Coperture Top - PPA cambia, FRW e Solar uguali (tratteggiate)
+        # 4️⃣ Copertura Top (tratteggiata verde, solo contorno PPA cambia)
         fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["PPA ERG Top"],
-            name="PPA ERG Top",
+            x=df["Anno"], y=df["Copertura Top"],
+            name="Copertura Top",
             mode="lines",
-            line=dict(color="rgba(255,220,80,1)", width=1.5, dash="dot"),
-            fill="tozeroy",
-            fillcolor="rgba(255,220,80,0.3)",
-            hovertemplate="PPA Top: %{y} GWh<extra></extra>"
+            line=dict(color="rgba(34,139,34,1)", width=2, dash="dot"),
+            hovertemplate="Copertura Top: %{y} GWh<extra></extra>"
         ))
 
-        # ⚪ Open Position Secure
+        # 5️⃣ Open Position Secure (area residua)
         fig.add_trace(go.Scatter(
             x=df["Anno"], y=df["Fabbisogno Adjusted"],
             name="Open Position Secure",
             mode="lines",
             line=dict(color="white", width=1.5),
             fill="tonexty",
-            fillcolor="rgba(255,255,255,0.9)",
+            fillcolor="rgba(255,255,255,0.8)",
             customdata=df["Open Position Secure"],
             hovertemplate="Open Position Secure: %{customdata} GWh<extra></extra>"
         ))
 
-        # ⚫ Open Position Top
-        fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Fabbisogno Adjusted"],
-            name="Open Position Top",
-            mode="lines",
-            line=dict(color="rgba(200,200,200,1)", width=1.5),
-            fill="tonexty",
-            fillcolor="rgba(230,230,230,0.8)",
-            customdata=df["Open Position Top"],
-            hovertemplate="Open Position Top: %{customdata} GWh<extra></extra>"
-        ))
-
-        # --- Layout ---
+        # Layout
         fig.update_layout(
-            title="📊 Fabbisogno, Coperture (PPA + FRW + Solar) e Open Position – Secure vs Top",
+            title="📊 Fabbisogno, Coperture Secure & Top e Open Position",
             yaxis_title="GWh",
             xaxis_title="Anno",
             legend_title="Legenda",
             hovermode="x unified",
-            xaxis=dict(tickformat="%Y", dtick="M12"),
             plot_bgcolor="white",
-            paper_bgcolor="white"
+            paper_bgcolor="white",
+            xaxis=dict(tickformat="%Y", dtick="M12")
         )
 
         st.plotly_chart(fig, use_container_width=True)
