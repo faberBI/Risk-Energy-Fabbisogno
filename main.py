@@ -148,7 +148,7 @@ if uploaded_file:
         xaxis=dict(
         type='category',  # forza solo valori discreti
         tickmode='linear'  # mostra ogni anno
-        )
+        ))
         
         st.plotly_chart(fig, use_container_width=True)
 
