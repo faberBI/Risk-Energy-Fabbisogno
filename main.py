@@ -75,7 +75,7 @@ if uploaded_file:
         ))
         
         fig.add_trace(go.Scatter(
-            x=df['Anno'], y=df['PPA ERG secure'],
+            x=df['Anno'], y=df['PPA ERG secure']+df['Solar'],
             name='PPA ERG Secure',
             mode='lines',
             line=dict(width=0.5, color='#A3C4DC'),
@@ -84,7 +84,7 @@ if uploaded_file:
         ))
         
         fig.add_trace(go.Scatter(
-            x=df['Anno'], y=df['FRW'],
+            x=df['Anno'], y=df['FRW']+df['PPA ERG secure']+df['Solar'],
             name='FRW',
             mode='lines',
             line=dict(width=0.5, color='#C2EABD'),
