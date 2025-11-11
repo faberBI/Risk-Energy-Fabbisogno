@@ -80,7 +80,8 @@ if uploaded_file:
             mode='lines',
             line=dict(width=0.5, color='#A3C4DC'),
             fill='tonexty',
-            hovertemplate='PPA ERG Secure: %{y} GWh<extra></extra>'
+            customdata=df['Solar']
+            hovertemplate='PPA ERG Secure: %{customdata} GWh<extra></extra>'
         ))
         
         fig.add_trace(go.Scatter(
@@ -89,7 +90,8 @@ if uploaded_file:
             mode='lines',
             line=dict(width=0.5, color='#C2EABD'),
             fill='tonexty',
-            hovertemplate='FRW: %{y} GWh<extra></extra>'
+            customdata=df['FWD'],
+            hovertemplate='FRW: %{customdata} GWh<extra></extra>'
         ))
         
         # --- Area bianca Open Position Secure ---
