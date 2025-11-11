@@ -128,15 +128,7 @@ if uploaded_file:
             line=dict(color='green', width=2, dash='dash'),
             hovertemplate='Copertura Top: %{y} GWh<extra></extra>'
         ))
-        
-        fig.add_trace(go.Scatter(
-            x=df['Anno'], y=df['Open Position Top'],
-            name='Open Position Top',
-            mode='lines',
-            line=dict(color='red', width=2, dash='dash'),
-            hovertemplate='Open Position Top: %{y} GWh<extra></extra>'
-        ))
-        
+               
         # Layout
         fig.update_layout(
             title='Fabbisogno vs Coperture Totali',
