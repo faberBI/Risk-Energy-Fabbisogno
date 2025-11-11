@@ -127,6 +127,14 @@ if uploaded_file:
             line=dict(color='green', width=2, dash='dash'),
             hovertemplate='Copertura Top: %{y} GWh<extra></extra>'
         ))
+
+        fig.add_trace(go.Scatter(
+            x=df['Anno'], y=df['Coperture Secure'],
+            name='Copertura Totale Secure',
+            mode='lines',
+            line=dict(color='green', width=2, dash='dashdot'),
+            hovertemplate='Copertura Secure: %{y} GWh<extra></extra>'
+        ))
                
         # Layout
         fig.update_layout(
