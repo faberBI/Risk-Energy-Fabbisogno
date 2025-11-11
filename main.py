@@ -52,8 +52,8 @@ if uploaded_file:
         df["Coperture Top"] = df["PPA ERG Top"] + df["FRW"] + df["Solar"]
 
         # Open position
-        df["Open Position Secure"] = df["Fabbisogno Adjusted"] - df["Coperture secure"]
-        df["Open Position Top"] = df["Fabbisogno Adjusted"] - df["Coperture top"]
+        df["Open Position Secure"] = df["Fabbisogno Adjusted"] - df["Coperture Secure"]
+        df["Open Position Top"] = df["Fabbisogno Adjusted"] - df["Coperture Top"]
 
         st.success("✅ Calcolo completato!")
 
