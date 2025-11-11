@@ -18,7 +18,7 @@ uploaded_file = st.file_uploader("📂 Carica file Excel", type=["xlsx"])
 if uploaded_file:
     df = pd.read_excel(uploaded_file)
 
-    required_cols = ["Anno", "Fabbisogno Adjusted", "Fabbisogno", 
+    required_cols = ["Anno", "Fabbisogno Adjusted", "Fabbisogno",
                      "PPA ERG secure", "PPA ERG baseline", "PPA ERG Top", "FRW", "Solar"]
     missing = [c for c in required_cols if c not in df.columns]
 
@@ -26,20 +26,15 @@ if uploaded_file:
         st.error(f"Mancano le colonne obbligatorie: {', '.join(missing)}")
     else:
         # --- Calcoli principali ---
-        # Scenario Secure with solar
         df["Open Position w Solar (Adjusted) secure"] = (
             df["Fabbisogno Adjusted"] - (df["PPA ERG secure"] + df["FRW"] + df["Solar"])
         )
-
-        # Scenario Top with solar
         df["Open Position w Solar (Adjusted) top"] = (
             df["Fabbisogno Adjusted"] - (df["PPA ERG Top"] + df["FRW"] + df["Solar"])
         )
-        # Scenario secure w/o solar
         df["Open Position w/o Solar (Adjusted) secure"] = (
             df["Fabbisogno Adjusted"] - (df["PPA ERG secure"] + df["FRW"])
         )
-        # Scenario top w/o solar
         df["Open Position w/o Solar (Adjusted) top"] = (
             df["Fabbisogno Adjusted"] - (df["PPA ERG Top"] + df["FRW"])
         )
@@ -107,7 +102,7 @@ if uploaded_file:
             hovertemplate="Solar Secure: %{y} GWh<extra></extra>"
         ))
 
-        # 3️⃣ Coperture SCENARIO TOP (più alte e più chiare)
+        # 3️⃣ Coperture SCENARIO TOP
         fig.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["PPA_cum_top"],
@@ -139,33 +134,26 @@ if uploaded_file:
             hovertemplate="Solar Top: %{y} GWh<extra></extra>"
         ))
 
-        # 4️⃣ Open Position Secure (bianco)
+        # 4️⃣ Linee tratteggiate per PPA ERG Secure e Top (EVIDENZA)
         fig.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["Fabbisogno Adjusted"],
-            name="Open Position Secure",
+            y=df["PPA ERG secure"],
+            name="Livello PPA Secure (linea tratteggiata)",
             mode="lines",
-            line=dict(color="white", width=2),
-            fill="tonexty",
-            fillcolor="rgba(255,255,255,1)",
-            customdata=df["Open Position w Solar (Adjusted) secure"],
-            hovertemplate="Open Position Secure: %{customdata} GWh<extra></extra>"
+            line=dict(color="rgba(0, 80, 0, 1)", width=3, dash="dash"),
+            hovertemplate="PPA Secure: %{y} GWh<extra></extra>"
         ))
 
-        # 5️⃣ Open Position Top (grigio chiaro)
         fig.add_trace(go.Scatter(
             x=df["Anno"],
-            y=df["Fabbisogno Adjusted"],
-            name="Open Position Top",
+            y=df["PPA ERG Top"],
+            name="Livello PPA Top (linea tratteggiata)",
             mode="lines",
-            line=dict(color="rgba(200,200,200,1)", width=2),
-            fill="tonexty",
-            fillcolor="rgba(220,220,220,0.6)",
-            customdata=df["Open Position w Solar (Adjusted) top"],
-            hovertemplate="Open Position Top: %{customdata} GWh<extra></extra>"
+            line=dict(color="rgba(0, 200, 0, 1)", width=3, dash="dot"),
+            hovertemplate="PPA Top: %{y} GWh<extra></extra>"
         ))
 
-        # 6️⃣ Fabbisogno Reale → blu tratteggiato sopra tutto
+        # 5️⃣ Fabbisogno Reale → blu tratteggiato
         fig.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["Fabbisogno"],
@@ -177,7 +165,7 @@ if uploaded_file:
 
         # Layout
         fig.update_layout(
-            title="Confronto Scenari Secure vs Top - Coperture e Open Position",
+            title="Confronto Scenari Secure vs Top - Coperture e Livelli PPA ERG",
             yaxis_title="GWh",
             xaxis_title="Anno",
             legend_title="Legenda",
