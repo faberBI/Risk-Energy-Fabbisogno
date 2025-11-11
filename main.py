@@ -84,7 +84,7 @@ if uploaded_file:
         ))
         
         fig.add_trace(go.Scatter(
-            x=df['Anno'], y=df['FWD'],
+            x=df['Anno'], y=df['FRW'],
             name='FRW',
             mode='lines',
             line=dict(width=0.5, color='#C2EABD'),
