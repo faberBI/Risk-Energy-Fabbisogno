@@ -48,8 +48,8 @@ if uploaded_file:
         df["PPA_cum_secure"] = df["PPA ERG secure"]
         df["PPA_cum_top"] = df["PPA ERG Top"]
 
-        df["Coperture secure"] = df["PPA ERG secure"] + df["FRW"] + df["Solar"]
-        df["Coperture top"] = df["PPA ERG Top"] + df["FRW"] + df["Solar"]
+        df["Coperture Secure"] = df["PPA ERG secure"] + df["FRW"] + df["Solar"]
+        df["Coperture Top"] = df["PPA ERG Top"] + df["FRW"] + df["Solar"]
 
         # Open position
         df["Open Position Secure"] = df["Fabbisogno Adjusted"] - df["Coperture secure"]
