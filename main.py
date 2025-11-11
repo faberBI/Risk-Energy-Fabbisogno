@@ -95,7 +95,7 @@ if uploaded_file:
         ))
         fig.add_trace(go.Scatter(
             x=df["Anno"], y=df["PPA ERG secure"] + df["FRW"],
-            name="FRW (comune)",
+            name="FRW",
             mode="lines",
             line=dict(color="rgba(0,150,255,1)", width=1.5),
             fill="tonexty",
@@ -104,7 +104,7 @@ if uploaded_file:
         ))
         fig.add_trace(go.Scatter(
             x=df["Anno"], y=df["Coperture secure"],
-            name="Solar (comune)",
+            name="Solar)",
             mode="lines",
             line=dict(color="rgba(255,140,0,1)", width=1.5),
             fill="tonexty",
@@ -121,24 +121,6 @@ if uploaded_file:
             fill="tozeroy",
             fillcolor="rgba(255,220,80,0.3)",
             hovertemplate="PPA Top: %{y} GWh<extra></extra>"
-        ))
-        fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["PPA ERG Top"] + df["FRW"],
-            name="FRW (Top)",
-            mode="lines",
-            line=dict(color="rgba(0,150,255,1)", width=1, dash="dot"),
-            fill="tonexty",
-            fillcolor="rgba(0,150,255,0.25)",
-            hovertemplate="FRW: %{y} GWh<extra></extra>"
-        ))
-        fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Coperture top"],
-            name="Solar (Top)",
-            mode="lines",
-            line=dict(color="rgba(255,140,0,1)", width=1, dash="dot"),
-            fill="tonexty",
-            fillcolor="rgba(255,140,0,0.25)",
-            hovertemplate="Solar: %{y} GWh<extra></extra>"
         ))
 
         # ⚪ Open Position Secure
