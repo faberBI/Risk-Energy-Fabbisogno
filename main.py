@@ -106,7 +106,7 @@ if uploaded_file:
         ))
 
         fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Copertura Secure"],
+            x=df["Anno"], y=df["Coperture Secure"],
             name="Solar",
             mode="lines",
             line=dict(color="rgba(0,128,0,1)", width=1.5),
@@ -117,7 +117,7 @@ if uploaded_file:
 
         # 4️⃣ Copertura Top (tratteggiata verde, solo contorno PPA cambia)
         fig.add_trace(go.Scatter(
-            x=df["Anno"], y=df["Copertura Top"],
+            x=df["Anno"], y=df["Coperture Top"],
             name="Copertura Top",
             mode="lines",
             line=dict(color="rgba(34,139,34,1)", width=2, dash="dot"),
