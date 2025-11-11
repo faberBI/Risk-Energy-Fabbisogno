@@ -135,7 +135,8 @@ if uploaded_file:
             line=dict(color='green', width=2, dash='dashdot'),
             hovertemplate='Copertura Secure: %{y} GWh<extra></extra>'
         ))
-               
+        
+        df['Anno'] = df['Anno'].dt.year        
         # Layout
         fig.update_layout(
         title='Fabbisogno vs Coperture Totali',
