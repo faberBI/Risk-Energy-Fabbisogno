@@ -138,13 +138,16 @@ if uploaded_file:
                
         # Layout
         fig.update_layout(
-            title='Fabbisogno vs Coperture Totali',
-            xaxis_title='Anno',
-            yaxis_title='Energia (GWh)',
-            hovermode='x unified',
-            plot_bgcolor='white',
-            paper_bgcolor='white',
-            legend_title='Legenda'
+        title='Fabbisogno vs Coperture Totali',
+        xaxis_title='Anno',
+        yaxis_title='Energia (GWh)',
+        hovermode='x unified',
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        legend_title='Legenda',
+        xaxis=dict(
+        type='category',  # forza solo valori discreti
+        tickmode='linear'  # mostra ogni anno
         )
         
         st.plotly_chart(fig, use_container_width=True)
