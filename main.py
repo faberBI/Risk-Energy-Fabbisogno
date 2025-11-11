@@ -52,8 +52,8 @@ if uploaded_file:
         df["Coperture Top"] = df["PPA ERG Top"] + df["FRW"] + df["Solar"]
 
         # Open position
-        df["Open Position Secure"] = df["Fabbisogno Adjusted"] - df["Coperture Secure"]
-        df["Open Position Top"] = df["Fabbisogno Adjusted"] - df["Coperture Top"]
+        df["Open Position Secure"] = df["Fabbisogno Adjusted"] - df["Coperture secure"]
+        df["Open Position Top"] = df["Fabbisogno Adjusted"] - df["Coperture top"]
 
         st.success("✅ Calcolo completato!")
 
@@ -64,37 +64,35 @@ if uploaded_file:
         
         fig = go.Figure()
         
-        # --- Stack coperture Secure ---
+        # Stack coperture Secure
         fig.add_trace(go.Scatter(
             x=df['Anno'], y=df['Solar'],
             name='Solar',
             mode='lines',
             line=dict(width=0.5, color='#FFD580'),
-            fill='tozeroy',
+            stackgroup='secure',  # <-- qui
             hovertemplate='Solar: %{y} GWh<extra></extra>'
         ))
         
         fig.add_trace(go.Scatter(
-            x=df['Anno'], y=df['PPA ERG secure']+df['Solar'],
+            x=df['Anno'], y=df['PPA ERG secure'],
             name='PPA ERG Secure',
             mode='lines',
             line=dict(width=0.5, color='#A3C4DC'),
-            fill='tonexty',
-            customdata= df['Solar'],
-            hovertemplate='PPA ERG Secure: %{customdata} GWh<extra></extra>'
+            stackgroup='secure',  # <-- qui
+            hovertemplate='PPA ERG Secure: %{y} GWh<extra></extra>'
         ))
         
         fig.add_trace(go.Scatter(
-            x=df['Anno'], y=df['FRW']+df['PPA ERG secure']+df['Solar'],
+            x=df['Anno'], y=df['FWD'],
             name='FRW',
             mode='lines',
             line=dict(width=0.5, color='#C2EABD'),
-            fill='tonexty',
-            customdata=df['FWD'],
-            hovertemplate='FRW: %{customdata} GWh<extra></extra>'
+            stackgroup='secure',  # <-- qui
+            hovertemplate='FRW: %{y} GWh<extra></extra>'
         ))
         
-        # --- Area bianca Open Position Secure ---
+        # Open Position Secure
         fig.add_trace(go.Scatter(
             x=df['Anno'], y=df['Open Position Secure'],
             name='Open Position Secure',
@@ -105,7 +103,7 @@ if uploaded_file:
             hovertemplate='Open Position Secure: %{y} GWh<extra></extra>'
         ))
         
-        # --- Linea Fabbisogno Totale ---
+        # Linee Fabbisogno e Top
         fig.add_trace(go.Scatter(
             x=df['Anno'], y=df['Fabbisogno Adjusted'],
             name='Fabbisogno Totale',
@@ -114,7 +112,6 @@ if uploaded_file:
             hovertemplate='Fabbisogno Totale: %{y} GWh<extra></extra>'
         ))
         
-        # --- Linea Copertura Totale Top (tratteggiata) ---
         fig.add_trace(go.Scatter(
             x=df['Anno'], y=df['Coperture Top'],
             name='Copertura Totale Top',
@@ -123,7 +120,6 @@ if uploaded_file:
             hovertemplate='Copertura Top: %{y} GWh<extra></extra>'
         ))
         
-        # --- Linea Open Position Top (tratteggiata) ---
         fig.add_trace(go.Scatter(
             x=df['Anno'], y=df['Open Position Top'],
             name='Open Position Top',
