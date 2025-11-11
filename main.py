@@ -80,7 +80,7 @@ if uploaded_file:
             mode='lines',
             line=dict(width=0.5, color='#A3C4DC'),
             fill='tonexty',
-            customdata=df['Solar'],
+            customdata= df['Solar'],
             hovertemplate='PPA ERG Secure: %{customdata} GWh<extra></extra>'
         ))
         
