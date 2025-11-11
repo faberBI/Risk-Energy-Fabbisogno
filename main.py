@@ -74,15 +74,15 @@ if uploaded_file:
             hovertemplate='Fabbisogno Adjusted: %{y} GWh<extra></extra>'
         ))
 
-        # 2️⃣ Coperture stacked (verde)
+        # 2️⃣ Coperture stacked (verde brillante con differenze più marcate)
         fig_solar.add_trace(go.Scatter(
             x=df["Anno"],
             y=df["PPA_cum"],
             name="PPA ERG/Cuscinetto",
             mode='lines',
-            line=dict(color='rgba(0, 176, 80, 0.6)', width=2),
+            line=dict(color='rgba(0, 120, 0, 1)', width=2),
             fill='tonexty',
-            fillcolor='rgba(0, 176, 80, 0.3)',
+            fillcolor='rgba(0, 120, 0, 0.4)',
             hovertemplate='PPA: %{y} GWh<extra></extra>'
         ))
         fig_solar.add_trace(go.Scatter(
@@ -90,9 +90,9 @@ if uploaded_file:
             y=df["FRW_cum"],
             name="FRW",
             mode='lines',
-            line=dict(color='rgba(0, 176, 80, 0.8)', width=2),
+            line=dict(color='rgba(0, 160, 0, 1)', width=2),
             fill='tonexty',
-            fillcolor='rgba(0, 176, 80, 0.5)',
+            fillcolor='rgba(0, 160, 0, 0.5)',
             hovertemplate='FRW: %{y} GWh<extra></extra>'
         ))
         fig_solar.add_trace(go.Scatter(
@@ -100,9 +100,9 @@ if uploaded_file:
             y=df["Solar_cum"],
             name="Solar",
             mode='lines',
-            line=dict(color='rgba(0, 176, 80, 1)', width=2),
+            line=dict(color='rgba(0, 200, 0, 1)', width=2),
             fill='tonexty',
-            fillcolor='rgba(0, 176, 80, 0.7)',
+            fillcolor='rgba(0, 200, 0, 0.6)',
             hovertemplate='Solar: %{y} GWh<extra></extra>'
         ))
 
