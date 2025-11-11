@@ -51,8 +51,6 @@ if uploaded_file:
         st.subheader("📈 Tabella con Open Position calcolati")
         st.dataframe(df.style.format("{:.0f}"))
 
-
-
         # Assicurati che "Anno" sia in datetime
         df["Anno"] = pd.to_datetime(df["Anno"], format="%Y")
         
@@ -72,7 +70,7 @@ if uploaded_file:
             line=dict(color='#00196c'),
             fill='tozeroy',
             fillcolor='rgba(0,25,108,0.3)',
-            hovertemplate='Fabbisogno Adjusted: %{y} MW<extra></extra>'
+            hovertemplate='Fabbisogno Adjusted: %{y} Gwh<extra></extra>'
         ))
         
         # 2️⃣ Coperture stacked
@@ -85,7 +83,7 @@ if uploaded_file:
             line=dict(color='#94dcf8'),
             fill='tonexty',
             fillcolor='rgba(148,220,248,0.7)',
-            hovertemplate='PPA: %{y} MW<extra></extra>'
+            hovertemplate='PPA: %{y} Gwh<extra></extra>'
         ))
         # FRW
         fig_solar.add_trace(go.Scatter(
@@ -96,7 +94,7 @@ if uploaded_file:
             line=dict(color='#003caa'),
             fill='tonexty',
             fillcolor='rgba(0,60,170,0.7)',
-            hovertemplate='FRW: %{y} MW<extra></extra>'
+            hovertemplate='FRW: %{y} Gwh<extra></extra>'
         ))
         # Solar
         fig_solar.add_trace(go.Scatter(
@@ -107,7 +105,7 @@ if uploaded_file:
             line=dict(color='#dde9ff'),
             fill='tonexty',
             fillcolor='rgba(221,233,255,0.7)',
-            hovertemplate='Solar: %{y} MW<extra></extra>'
+            hovertemplate='Solar: %{y} Gwh<extra></extra>'
         ))
         
         # 3️⃣ Open Position → bianco (delta tra fabbisogno e copertura totale)
@@ -120,13 +118,13 @@ if uploaded_file:
             fill='tonexty',
             fillcolor='rgba(255,255,255,1)',
             customdata=df["Open Position w Solar (Adjusted)"],
-            hovertemplate='Open Position: %{customdata} MW<extra></extra>'
+            hovertemplate='Open Position: %{customdata} Gwh<extra></extra>'
         ))
         
         # Layout
         fig_solar.update_layout(
             title="Scenario con Solar - Grafico ad Aree",
-            yaxis_title="MW",
+            yaxis_title="Gwh",
             xaxis_title="Anno",
             legend_title="Legenda",
             hovermode="x unified",
