@@ -98,8 +98,7 @@ if uploaded_file:
             name='Open Position Secure',
             mode='lines',
             line=dict(color='white', width=1.5),
-            fill='tonexty',
-            fillcolor='rgba(255,255,255,0.8)',
+            stackgroup='secure',  # <-- qui
             hovertemplate='Open Position Secure: %{y} GWh<extra></extra>'
         ))
         
