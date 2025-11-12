@@ -107,7 +107,7 @@ if uploaded_file:
             x=df['Anno'], y=df['Fabbisogno Adjusted'],
             name='Fabbisogno Adjusted',
             mode='lines',
-            line=dict(color='black', width=2),
+            line=dict(color='black', width=2, dash='dashdot'),
             hovertemplate='Fabbisogno Totale: %{y} GWh<extra></extra>'
         ))
                 # Linee Fabbisogno e Top
@@ -116,7 +116,7 @@ if uploaded_file:
             y=df['Fabbisogno'],
             name='Fabbisogno',
             mode='lines',
-            line=dict(color='blue', width=2, dash='dashdot'),  # linea blu tratteggiata
+            line=dict(color='blue', width=2, dash='solid'),  # linea blu tratteggiata
             hovertemplate='Fabbisogno Totale: %{y} GWh<extra></extra>'
             ))
         
